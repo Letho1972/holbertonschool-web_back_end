@@ -9,35 +9,16 @@ import random
 """Definition of the asynchronous coroutine"""
 
 
-async def wait_random(max_delay: float = 10) -> float:
+async def wait_random(max_delay: int = 10) -> float:
+    """
+    Asynchronously sleeps for a random duration between 0 and max_delay.
 
-    """Generates a random delay between 0 and max_delay as a float value"""
+    Args:
+    - max_delay (int): the maximum delay in seconds (default is 10).
 
-    delay = random.uniform(0, max_delay)
-
-    """ Waits for the generated duration"""
-
-    await asyncio.sleep(delay)
-
-    """Returns the generated delay"""
-
-    return delay
-
-"""Main function to run the coroutine in the asyncio event loop"""
-
-
-async def main():
-
-    """Calls and awaits the result of the wait_random coroutine"""
-
-    result = await wait_random()
-
-    """Prints the generated random delay"""
-
-    print(f"Random delay: {result} seconds")
-
-    """Runs the asyncio event loop with the main function"""
-
-    if __name__ == "__main__":
-
-        asyncio.run(main())
+    Returns:
+    - float: the actual random delay that occurred.
+    """
+    random_delay = random.uniform(0, max_delay)
+    await asyncio.sleep(random_delay)
+    return random_delay
