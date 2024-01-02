@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 """ Async function for concurrent execution of wait_random. """
 
 import asyncio
