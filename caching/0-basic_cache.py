@@ -5,9 +5,8 @@
 
 class BaseCaching:
 
-    """self cache data"""
-
     def __init__(self):
+        """This caching system doesn’t have limit."""
         self.cache_data = {}
 
 
