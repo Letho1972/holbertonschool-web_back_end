@@ -2,9 +2,14 @@
 """ BaseCaching module
 """
 
+
 class BaseCaching:
+
+    """self cache data"""
+
     def __init__(self):
         self.cache_data = {}
+
 
 class BasicCache(BaseCaching):
     def put(self, key, item):
@@ -17,7 +22,7 @@ class BasicCache(BaseCaching):
         if key is None or key not in self.cache_data:
             return None
         return self.cache_data[key]
-    
+
     def print_cache(self):
         """Afficher le contenu du cache."""
         print("Current cache:")
