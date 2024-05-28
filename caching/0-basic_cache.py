@@ -3,24 +3,11 @@
 
 """ 0. Basic dictionary
 """
-
-
-class BaseCaching:
-
-    """A documentation is not a simple word, it’s a real sentence
-        explaining
-    """
-
-    def __init__(self):
-        """A documentation is not a simple word, it’s a real sentence
-        explaining
-        what’s the purpose of the module,
-        class or method (the length of it will be verified)"""
-        self.cache_data = {}
-
+from base_caching import BaseCaching
 
 class BasicCache(BaseCaching):
     """ A class BasicCache that inherits from BaseCaching"""
+
     def put(self, key, item):
         """Assign the value item to the key key in self.cache_data."""
         if key is not None and item is not None:
@@ -31,9 +18,3 @@ class BasicCache(BaseCaching):
         if key is None or key not in self.cache_data:
             return None
         return self.cache_data[key]
-
-    def print_cache(self):
-        """Afficher le contenu du cache."""
-        print("Current cache:")
-        for key in sorted(self.cache_data.keys()):
-            print(f"{key}: {self.cache_data[key]}")
