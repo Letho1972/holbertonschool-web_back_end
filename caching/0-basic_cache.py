@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
 
 
-""" A documentation is not a simple word, it’s a real sentence explaining
-        what’s the purpose of the module,
-        class or method (the length of it will be verified)
+""" 0. Basic dictionary
 """
 
 
 class BaseCaching:
 
+    """A documentation is not a simple word, it’s a real sentence
+        explaining
+    """
+
     def __init__(self):
-        """A documentation is not a simple word, it’s a real sentence explaining
+        """A documentation is not a simple word, it’s a real sentence
+        explaining
         what’s the purpose of the module,
         class or method (the length of it will be verified)"""
         self.cache_data = {}
 
 
 class BasicCache(BaseCaching):
+    """ A class BasicCache that inherits from BaseCaching"""
     def put(self, key, item):
         """Assign the value item to the key key in self.cache_data."""
         if key is not None and item is not None:
