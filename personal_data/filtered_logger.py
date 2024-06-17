@@ -8,17 +8,13 @@ that returns the log message obfuscated
 """
 
 import re
-
-from typing import List, Union
+from typing import List
 
 
 def filter_datum(fields: list[str], redaction: str,
-                 message: Union[str, List[str]], separator: str):
-    """
-    Returns the log message obfuscated
-    """
-    for field in fields:
-        message = re.sub(f"{field}{separator}[^{separator}]*",
-                         f"{field}{separator}{redaction}", message)
+                 message: str, separator: str) -> str:
+    """ Returns the log message obfuscated """
 
-    return message
+    return re.sub(f'({"|".join(fields)})=[^{separator}]*',
+                  lambda match: match.group(0).split('=')[0] + f'={redaction}',
+                  message)
