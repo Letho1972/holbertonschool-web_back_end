@@ -2,9 +2,6 @@
 """
 Main file
 """
-import logging
-import re
-
 
 filter_datum = __import__('filtered_logger').filter_datum
 
