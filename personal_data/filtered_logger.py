@@ -13,22 +13,22 @@ from typing import List
 
 def filter_datum(fields: List[str],
                  redaction: str, message: str, separator: str) -> str:
+    """
+    return the log message
+    """
     for field in fields:
         message = re.sub(r'(?<={}=).*?(?={})'.format(field,
                          separator), redaction, message)
-
-        """ return the log message
-        """
-        return message
+    return message
 
 
 class RedactingFormatter(logging.Formatter):
-    """ Redacting Formatter class
     """
-
+    Redacting Formatter class
+    """
     REDACTION = "***"
     FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
-    SEPARATOR = ";"
+    SEPARATOR = "; "
 
     def __init__(self, fields: List[str]):
 
@@ -40,8 +40,8 @@ class RedactingFormatter(logging.Formatter):
         self.fields = fields
 
     def format(self, record: logging.LogRecord) -> str:
-
-        """ Implementation of the format method
+        """
+        Implementation of the format method
         that uses super().format(record)
         to get the original message
         and then applies filter_datum
