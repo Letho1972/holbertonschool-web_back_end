@@ -52,6 +52,7 @@ class RedactingFormatter(logging.Formatter):
         return filter_datum(self.fields, self.REDACTION,
                             original_message, self.SEPARATOR)
 
+
 def get_logger() -> logging.Logger:
     """
     Creates and returns a logger configured to redact PII fields.
