@@ -10,11 +10,13 @@ import logging
 import re
 from typing import List
 
+PII_FIELDS = ('name', 'address', 'phone_number', 'email', 'ssn')
+
 
 def filter_datum(fields: List[str],
-                 redaction: str, message: str, separator: str)-> str:
+                 redaction: str, message: str, separator: str) -> str:
     """
-    return the log message
+    return the log message with PII fields redacted.
     """
     for field in fields:
         message = re.sub(r'(?<={}=).*?(?={})'.format(field,
@@ -31,7 +33,6 @@ class RedactingFormatter(logging.Formatter):
     SEPARATOR = "; "
 
     def __init__(self, fields: List[str]):
-
         """
         Added fields argument to __init__
         constructor and assigned to self.fields.
@@ -50,3 +51,19 @@ class RedactingFormatter(logging.Formatter):
         original_message = super(RedactingFormatter, self).format(record)
         return filter_datum(self.fields, self.REDACTION,
                             original_message, self.SEPARATOR)
+
+def get_logger() -> logging.Logger:
+    """
+    Creates and returns a logger configured to redact PII fields.
+    """
+    logger = logging.getLogger("user_data")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+
+    # Create a StreamHandler with RedactingFormatter
+    stream_handler = logging.StreamHandler()
+    formatter = RedactingFormatter(PII_FIELDS)
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+
+    return logger
