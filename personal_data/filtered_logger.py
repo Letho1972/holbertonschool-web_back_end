@@ -1,85 +1,98 @@
 #!/usr/bin/env python3
-
-"""
-This code respects the constraints by using super().format
-to format the initial message,
-then applies filtering using filter_datum
-"""
-
-import logging
+""" filter_datum module """
 import re
 from typing import List
-import os
+import logging
 import mysql.connector
-
-PII_FIELDS = ('name', 'address', 'phone_number', 'email', 'ssn')
-
-
-def filter_datum(fields: List[str],
-                 redaction: str, message: str, separator: str) -> str:
-    """
-    return the log message with PII fields redacted.
-    """
-    for field in fields:
-        message = re.sub(r'(?<={}=).*?(?={})'.format(field,
-                         separator), redaction, message)
-    return message
+import os
 
 
 class RedactingFormatter(logging.Formatter):
-    """
-    Redacting Formatter class
-    """
+    """ Redacting Formatter class """
+
     REDACTION = "***"
     FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
-    SEPARATOR = "; "
+    SEPARATOR = ";"
 
     def __init__(self, fields: List[str]):
-        """
-        Added fields argument to __init__
-        constructor and assigned to self.fields.
-        """
+        """ Constructor """
         super(RedactingFormatter, self).__init__(self.FORMAT)
         self.fields = fields
 
     def format(self, record: logging.LogRecord) -> str:
-        """
-        Implementation of the format method
-        that uses super().format(record)
-        to get the original message
-        and then applies filter_datum
-        to filter the specified fields.
-        """
-        original_message = super(RedactingFormatter, self).format(record)
-        return filter_datum(self.fields, self.REDACTION,
-                            original_message, self.SEPARATOR)
+        """ Format the record """
+        record.msg = filter_datum(
+            self.fields, self.REDACTION, record.msg, self.SEPARATOR)
+        return super().format(record)
+
+
+def filter_datum(
+        fields: List[str],
+        redaction: str, message: str, separator: str) -> str:
+    """
+    Filter the message by replacing the words in fields with the redaction
+    Args:
+        fields: a list of fields to replace in the message
+        redaction: a string representing the redacted message
+        message: a string representing the log line
+        separator: a string representing the separator of fields
+    Returns:
+        a string representing the log line
+    """
+    pattern = '|'.join([f"{field}=.*?(?={separator}|$)" for field in fields])
+    return re.sub(
+        pattern, lambda m: f"{m.group().split('=')[0]}={redaction}", message)
 
 
 def get_logger() -> logging.Logger:
-    """
-    Creates and returns a logger configured to redact PII fields.
-    """
+    """ Get logger function """
     logger = logging.getLogger("user_data")
     logger.setLevel(logging.INFO)
     logger.propagate = False
 
-    # Create a StreamHandler with RedactingFormatter
     stream_handler = logging.StreamHandler()
-    formatter = RedactingFormatter(PII_FIELDS)
+    formatter = RedactingFormatter(list(PII_FIELDS))
     stream_handler.setFormatter(formatter)
+
     logger.addHandler(stream_handler)
 
     return logger
 
 
-def get_db() -> mysql.connector.connection.MySQLConnection:
+PII_FIELDS = ("name", "email", "phone", "ssn", "password")
 
-    """
-    function that connect to secure option database
-    """
+
+def get_db() -> mysql.connector.connection.MySQLConnection:
+    """ Get database connection """
     username = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
     password = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
     host = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
-    dbname = os.getenv("PERSONAL_DATA_DB_NAME", "default_db")
+    database = os.getenv("PERSONAL_DATA_DB_NAME")
+
     return mysql.connector.connect(
-        user=username, password=password, host=host, database=dbname)
+        user=username,
+        password=password,
+        host=host,
+        database=database
+    )
+
+
+def main():
+    """ Main function """
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users")
+    fields = [i[0] for i in cursor.description]
+
+    logger = get_logger()
+
+    for row in cursor:
+        message = "; ".join([f"{fields[i]}={row[i]}" for i in range(len(row))])
+        logger.info(message)
+
+    cursor.close()
+    db.close()
+
+
+if __name__ == "__main__":
+    main()
