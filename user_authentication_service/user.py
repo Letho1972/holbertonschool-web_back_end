@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-"""
-Create a SQLAlchemy model named User
+"""Create a SQLAlchemy model named User
 for a database table named users
 (by using the mapping declaration of SQLAlchemy).
 """
@@ -10,7 +9,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
-# class User(Base)
+"""class User(Base)
+"""
 
 
 class User(Base):
