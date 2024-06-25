@@ -4,7 +4,7 @@
 for a database table named users
 (by using the mapping declaration of SQLAlchemy).
 """
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 
 
@@ -16,8 +16,6 @@ class User(Base):
     """class User"""
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True)
-    email = Column(String(250), nullable=False)
-    hashed_password = Column(String(250), nullable=False)
-    session_id = Column(String(250), nullable=True)
-    reset_token = Column(String(250), nullable=True)
+    id = Column(Integer, Sequence('user_id_seq'), primary_key=True)
+    name = Column(String(50))
+    email = Column(String(50), unique=True)
