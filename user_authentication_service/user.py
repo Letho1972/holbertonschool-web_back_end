@@ -10,7 +10,7 @@ Base = declarative_base()
 
 class User(Base):
     """class User"""
-    __tablename__ = "users"
+    __tablename__ = "user"
 
     id = Column(Integer, primary_key=True)
     email = Column(String(250), nullable=False)

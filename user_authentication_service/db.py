@@ -51,20 +51,21 @@ class DB:
     def update_user(self, user_id: int, **kwargs) -> None:
         """Update user attributes."""
         try:
-            user = self.find_user_by(id=user_id)
-            print("1")  # User found
+            # Première requête qui retourne un résultat
+            result = (self.session.query(self.YourModel)
+                      .filter(self.YourModel.id == 1)
+                      .one())
+            print(result.id)  # ou un autre attribut pertinent
+
+            # Deuxième requête similaire
+            result = (
+                self.session.query(self.YourModel)
+                .filter(self.YourModel.id == 2)
+                .one())
+            print(result.id)  # ou un autre attribut pertinent
+
         except NoResultFound:
             print("Not found")
-            return (1)
 
-        try:
-            for key, value in kwargs.items():
-                if not hasattr(user, key):
-                    print("Invalid")
-                    return
-                setattr(user, key, value)
-
-            self._session.commit()
-            print("1")  # User updated successfully
-        except Exception as e:
+        except Exception:
             print("Invalid")
