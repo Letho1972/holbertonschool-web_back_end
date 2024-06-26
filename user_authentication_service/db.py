@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 from sqlalchemy.orm.exc import NoResultFound
-
+from sqlalchemy.exc import InvalidRequestError
 
 from user import Base, User
 
@@ -41,43 +41,28 @@ class DB:
         return user
 
     def find_user_by(self, **kwargs) -> User:
-        """ 2. Find user by
         """
-        results = self._session.query(User).filter_by(**kwargs)
-        return results.one()
+        Method takes in arbitrary keyword arguments and returns the first
+        row found in the users table
+        """
+        try:
+            user = self._session.query(User).filter_by(**kwargs).first()
+            if user is None:
+                raise NoResultFound
+            return user
+        except InvalidRequestError:
+            raise
 
     def update_user(self, user_id: int, **kwargs) -> None:
-        """Update user attributes."""
-        try:
-            # Première requête qui retourne un résultat
-            result = (self.session.query(self.YourModel)
-                      .filter(self.YourModel.id == 1)
-                      .one())
-            print(result.id)  # ou un autre attribut pertinent
-
-            # Deuxième requête similaire
-            result = (
-                self.session.query(self.YourModel)
-                .filter(self.YourModel.id == 2)
-                .one())
-            print(result.id)  # ou un autre attribut pertinent
-
-        except NoResultFound:
-            print("Not found")
-
-        except Exception:
-            print("Invalid")
-
-        # Trouver l'utilisateur par user_id
-
-        self.user = self.find_user_by(id=user_id)
-
-    # Mettre à jour les attributs de l'utilisateur
+        """
+        Method to locate the user to update, then will update the user’s
+        attributes as passed in the method’s arguments then commit changes
+        to the database.
+        """
+        user = self.find_user_by(id=user_id)
         for key, value in kwargs.items():
-            if hasattr(User, key):
-                setattr(User, key, value)
+            """check if object have attribute"""
+            if hasattr(user, key):
+                setattr(user, key, value)
             else:
-                raise ValueError(f"{key} is not a valid attribute of User.")
-
-        # Commit les changements dans la base de données
-        self._session.commit()
+                raise ValueError
