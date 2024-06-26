@@ -67,3 +67,17 @@ class DB:
 
         except Exception:
             print("Invalid")
+
+        # Trouver l'utilisateur par user_id
+
+        self.user = self.find_user_by(id=user_id)
+
+    # Mettre à jour les attributs de l'utilisateur
+    for key, value in kwargs.items():
+        if hasattr(User, key):
+            setattr(User, key, value)
+        else:
+            raise ValueError(f"{key} is not a valid attribute of User.")
+
+    # Commit les changements dans la base de données
+    self.session.commit()
