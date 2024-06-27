@@ -1,59 +1,51 @@
 #!/usr/bin/env python3
-"""Hash password"""
+""" Hash password module """
 import bcrypt
+import uuid
 from db import DB
 from user import User
 from sqlalchemy.orm.exc import NoResultFound
 
-import uuid
+
+def _hash_password(password: str) -> bytes:
+    """ Module that hash password """
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password.encode(), salt)
+
+    return hashed_password
+
+
+def _generate_uuid() -> str:
+    """ Generate a new UUID """
+    return str(uuid.uuid4())
+
 
 class Auth:
-    """Auth class to interact with the authentication database.
-    """
+    """ Auth class to interact with the authentication database. """
+
     def __init__(self):
-        """initialization"""
+        """ Constructor method """
         self._db = DB()
 
     def register_user(self, email: str, password: str) -> User:
-        """Registrer user"""
+        """ Register a user and return the User object """
         try:
-            """Try to find the user by email"""
             self._db.find_user_by(email=email)
-            """if email already existe"""
-            raise ValueError(f"User {email} already exists")
+            raise ValueError(f'User {email} already exists')
         except NoResultFound:
-            """if no email found, we do the registration"""
-            hashed_password = self._hash_password(password)
-            """Add user to the database and return the User object"""
-            user = self._db.add_user(
-                email=email, hashed_password=hashed_password)
-            return user
-
-    def _hash_password(self, password: str) -> bytes:
-        """
-        Hashes a password using bcrypt.
-        Args:
-        password (str): The password to hash.
-        Returns:
-        bytes: The hashed password.
-        """
-        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            return self._db.add_user(email, _hash_password(password))
 
     def valid_login(self, email: str, password: str) -> bool:
-        """
-        Method taht expect email and password required arguments
-        and return a boolean
-        """
-
+        """ Check if the login credentials are valid """
         try:
             user = self._db.find_user_by(email=email)
-            return bcrypt.checkpw(
-                password.encode('utf-8'), user.hashed_password)
+            hashed_password = user.hashed_password
+            return bcrypt.checkpw(password.encode(), hashed_password)
         except NoResultFound:
             return False
 
     def create_session(self, email: str) -> str:
-        """Create session ID for user if exist"""
+        """ create_session: returns the session ID as a string """
         try:
             user = self._db.find_user_by(email=email)
             session_id = _generate_uuid()
