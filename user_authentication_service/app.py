@@ -6,6 +6,7 @@ from flask import Flask, jsonify
 
 app = Flask(__name__)
 
+
 @app.route('/', methods=['GET'])
 def home():
     """ a single GET route ("/")"""
@@ -14,6 +15,7 @@ def home():
         'message': 'Hello, World!',
         'status': 'success'
     })
+
 
 if __name__ == '__main__':
     app.run(debug=True)
