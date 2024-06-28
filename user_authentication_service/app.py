@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from flask import Flask, jsonify, request, abort, make_response, redirect, url_for
+from flask import Flask, jsonify, request, abort, make_response, redirect
 from auth import Auth
 
 """ Set up a basic Flask app """
@@ -50,6 +50,7 @@ def login():
     response.set_cookie("session_id", session_id)
 
     return response
+
 
 @app.route('/sessions', methods=['DELETE'], strict_slashes=False)
 def logout():
