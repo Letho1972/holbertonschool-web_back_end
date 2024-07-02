@@ -1,40 +1,35 @@
-#!/usr/bin/env python3
-
 import unittest
+from unittest.mock import patch, Mock
 from parameterized import parameterized
+import requests
 
-# Mock implementation of the access_nested_map function for testing purposes
-
-
-def access_nested_map(nested_map, path):
-    current = nested_map
-    for key in path:
-        current = current[key]
-    return current
+# Assuming utils.get_json is implemented as follows
 
 
-class TestAccessNestedMap(unittest.TestCase):
+def get_json(url):
+    response = requests.get(url)
+    return response.json()
+
+
+class TestGetJson(unittest.TestCase):
     @parameterized.expand([
-        ({"a": 1}, ("a",), 1),
-        ({"a": {"b": 2}}, ("a",), {"b": 2}),
-        ({"a": {"b": 2}}, ("a", "b"), 2),
+        ("http://example.com", {"payload": True}),
+        ("http://holberton.io", {"payload": False}),
     ])
-    def test_access_nested_map(self, nested_map, path, expected):
-        self.assertEqual(access_nested_map(nested_map, path), expected)
+    def test_get_json(self, test_url, test_payload):
+        with patch('requests.get') as mocked_get:
+            # Create a mock response object with a json method
+            mocked_response = Mock()
+            mocked_response.json.return_value = test_payload
+            mocked_get.return_value = mocked_response
 
-    @parameterized.expand([
-        ({}, ("a",)),
-        ({"a": 1}, ("a", "b")),
-    ])
-    def test_access_nested_map_exception(self, nested_map, path):
-        # the assertRaises context manager to test that a KeyError is raised
-        with self.assertRaises((KeyError, TypeError)) as cm:
-            access_nested_map(nested_map, path)
-        if isinstance(cm.exception, KeyError):
-            self.assertEqual(str(cm.exception), f"'{path[-1]}'")
-        else:
-            self.assertEqual(str(cm.exception),
-                             "'int' object is not subscriptable")
+            # Call the function being tested
+            result = get_json(test_url)
+
+            # Assert requests.get was called exactly once with test_url
+            mocked_get.assert_called_once_with(test_url)
+            # Assert the result is equal to test_payload
+            self.assertEqual(result, test_payload)
 
 
 if __name__ == '__main__':
