@@ -15,6 +15,7 @@ def access_nested_map(nested_map, path):
 
 
 class TestAccessNestedMap(unittest.TestCase):
+    """Tests the `access_nested_map` function."""
     @parameterized.expand([
         ({"a": 1}, ("a",), 1),
         ({"a": {"b": 2}}, ("a",), {"b": 2}),
@@ -44,7 +45,7 @@ def get_json(url):
 
 
 class TestGetJson(unittest.TestCase):
-    """Tests the `get_json` function."""
+    # Tests the `get_json` function.
     @parameterized.expand([
         ("http://example.com", {"payload": True}),
         ("http://holberton.io", {"payload": False}),
@@ -54,7 +55,7 @@ class TestGetJson(unittest.TestCase):
             test_url: str,
             test_payload: Dict,
     ) -> None:
-        """Tests `get_json`'s output."""
+        #Tests `get_json`'s output.
         attrs = {'json.return_value': test_payload}
         with patch("requests.get", return_value=Mock(**attrs)) as req_get:
             self.assertEqual(get_json(test_url), test_payload)
